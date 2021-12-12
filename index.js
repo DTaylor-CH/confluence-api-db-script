@@ -57,7 +57,6 @@ const promptUserForParameters = async () => {
     setConfluenceSpace(spaceName);
     await mongoConnect();
     const allPages = await getAllPagesInSpaceConfluenceApi();
-    console.log(allPages);
     await persistGetCallResponses(allPages);
     await mongoDisconnect();
   } else {
@@ -65,6 +64,7 @@ const promptUserForParameters = async () => {
       "All values must be set, either by environment variables or by user input"
     );
   }
+  console.log("Script exiting");
   rl.close();
 };
 

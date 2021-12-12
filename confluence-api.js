@@ -1,10 +1,7 @@
 // External imports:
 const fetch = require("node-fetch");
 
-// Internal imports:
-const { writeRecordsToMongo } = require("./mongo-service");
-
-// // Module variables:
+// Module variables:
 const _baseUrl = "https://companieshouse.atlassian.net/wiki";
 let _getAllPagesNextPage;
 
@@ -28,11 +25,11 @@ const setConfluenceSpace = (spaceName) => {
 };
 
 const getAllPagesInSpaceConfluenceApi = async () => {
-  // starts as false, but will be set true
+  console.log("Commencing API GET call");
+  // starts as false, but will be set true if there is no 'next' link
   if (_getAllPagesNextPage) {
     return fetch(_baseUrl + _getAllPagesNextPage, _requestOptions)
       .then((response) => {
-        console.log("found something");
         return response.json();
       })
       .then((jsonResponseBody) => {
@@ -42,7 +39,9 @@ const getAllPagesInSpaceConfluenceApi = async () => {
       })
       .catch((error) => console.log("error", error));
   } else {
-    console.log("reached last page of API response");
+    console.log(
+      `API calls complete. Total of ${_allPages.length} entries found`
+    );
   }
   return _allPages;
 };

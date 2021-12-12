@@ -35,10 +35,9 @@ const mongoDisconnect = async () => {
 };
 
 const persistGetCallResponses = async (postsArray) => {
-  for (post of postsArray) {
-    // making it clearer that the post's ID (called just 'id' in API response) relates to post rather than Mongo ID by renaming it 'post_id'
-    // delete Object.assign(post, { ["post_id"]: post["id"] })["id"];
+  console.log("Commencing upsert operations");
 
+  for (post of postsArray) {
     try {
       await _client
         .db(_db)
@@ -54,7 +53,10 @@ const persistGetCallResponses = async (postsArray) => {
             },
           },
           { upsert: true }
-        );
+        )
+        .then((result) => {
+          _lastSuccessfulUpsert = result.upsertedId;
+        });
     } catch (err) {
       console.log(err);
       throw new Error(
@@ -62,6 +64,7 @@ const persistGetCallResponses = async (postsArray) => {
       );
     }
   }
+  console.log("Upsert operations completed without errors");
 };
 
 module.exports = {
