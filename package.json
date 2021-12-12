@@ -1,0 +1,16 @@
+{
+  "name": "confluence-api-db-script",
+  "version": "0.1.0",
+  "description": "Script to populate a mongo db instance with a records of all pages in a given space in Confluence",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dom Taylor",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "mongodb": "^4.2.1",
+    "node-fetch": "^2.6.6"
+  }
+}
