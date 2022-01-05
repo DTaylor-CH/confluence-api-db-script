@@ -1,5 +1,3 @@
-// const prompt = (query) => new Promise((resolve) => rl.question(query, resolve));
-
 // Internal imports:
 const {
   setDbParameters,
@@ -15,7 +13,7 @@ const {
 } = require("../external-services/confluence-api");
 
 // User inputs own parametes for Mongo script or accepts env vars as default (by pressing 'enter')
-const promptUserForParameters = async (prompt) => {
+const populateMongoSubScript = async (prompt) => {
   const spaceName =
     (await prompt(
       `What is your Confluence Space name? (default=${process.env.SPACE_NAME}): `
@@ -55,10 +53,6 @@ const promptUserForParameters = async (prompt) => {
       "All values must be set, either by environment variables or by user input"
     );
   }
-};
-
-const populateMongoSubScript = async (prompt) => {
-  await promptUserForParameters(prompt);
 };
 
 module.exports = {
