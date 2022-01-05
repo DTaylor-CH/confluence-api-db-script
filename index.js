@@ -3,17 +3,7 @@ require("dotenv").config();
 const readline = require("readline");
 
 // Internal imports:
-const {
-  setDbParameters,
-  mongoConnect,
-  mongoDisconnect,
-  persistGetCallResponses,
-} = require("./external-services/mongo-service");
-const {
-  setAuthorisationHeader,
-  setConfluenceSpace,
-  getAllPagesInSpaceConfluenceApi,
-} = require("./external-services/confluence-api");
+const { populateMongoSubScript } = require("./internal-scripts/populate-mongo");
 
 // Set-up to allow command line input to be assigned to variables, and program to exit when done
 const rl = readline.createInterface({
@@ -23,49 +13,38 @@ const rl = readline.createInterface({
 rl.on("close", () => process.exit(0));
 const prompt = (query) => new Promise((resolve) => rl.question(query, resolve));
 
-// User inputs own parametes for Mongo script or accepts env vars as default (by pressing 'enter')
-const promptUserForParameters = async () => {
-  const spaceName =
-    (await prompt(
-      `What is your Confluence Space name? (default=${process.env.SPACE_NAME}): `
-    )) || process.env.SPACE_NAME;
-
-  const mongoUri =
-    (await prompt(
-      `What is your MongoDB URI? (default=${process.env.MONGO_URI}): `
-    )) || process.env.MONGO_URI;
-
-  const dbName =
-    (await prompt(
-      `What is your Database name? (default=confluence_pages): `
-    )) || "confluence_pages";
-
-  const collectionName =
-    (await prompt(
-      `What is your Collection name? (default=${spaceName.toLowerCase()}_space): `
-    )) || spaceName.toLowerCase() + "_space";
-
-  const accessToken =
-    (await prompt(
-      `Whats is your Confluence API Access Token? (default=${process.env.ACCESS_TOKEN}): `
-    )) || process.env.ACCESS_TOKEN;
-
-  // guard against any undefined values before Mongo update script starts
-  if (mongoUri && dbName && collectionName && spaceName && accessToken) {
-    setDbParameters(mongoUri, dbName, collectionName);
-    setAuthorisationHeader(accessToken);
-    setConfluenceSpace(spaceName);
-    await mongoConnect();
-    const allPages = await getAllPagesInSpaceConfluenceApi();
-    await persistGetCallResponses(allPages);
-    await mongoDisconnect();
-  } else {
-    console.log(
-      "All values must be set, either by environment variables or by user input"
-    );
+const executeChosenScript = async (scriptNumber) => {
+  switch (scriptNumber) {
+    case "0":
+      console.log("Script exiting");
+      rl.close();
+      break;
+    case "1":
+      await populateMongoSubScript(prompt);
+      break;
+    default:
+      console.log("No script found with this number");
   }
-  console.log("Script exiting");
-  rl.close();
+
+  chooseAndExecuteChosenScript();
 };
 
-promptUserForParameters();
+const chooseAndExecuteChosenScript = async () => {
+  const scriptNumber = await prompt(
+    `
+Which script would you like to run?:
+  0. Exit
+  1. Populate Mongo (Calls Confluence API for all pages in a single Confluence Space and saves metadata in a Mongo collection of your choice)
+    
+    `
+  );
+
+  if (scriptNumber) {
+    executeChosenScript(scriptNumber);
+  } else {
+    console.log("You must choose a script number");
+    chooseAndExecuteChosenScript();
+  }
+};
+
+chooseAndExecuteChosenScript();
