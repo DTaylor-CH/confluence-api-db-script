@@ -68,16 +68,20 @@ const persistGetCallResponses = async (postsArray) => {
   console.log("Upsert operations completed without errors");
 };
 
-const getAllMongoTaggedPagesNotTaggedInConfluence = () => {
-  console.log(
-    "Reading from database. Documents which have tags, but which are not recorded as having had those tags transferred to Confluence will be held temporarily in memory"
-  );
-};
+const getMongoTaggedPostsNotInConfluence = async () =>
+  // .find() returns a cursor rather than the actual document. Implicit return
+  await _client
+    .db(_db)
+    .collection(_collectionName)
+    .find({
+      tagged_in_confluence: false,
+      gui_suggested_tags: { $exists: true },
+    });
 
 module.exports = {
   setDbParameters,
   mongoConnect,
   mongoDisconnect,
   persistGetCallResponses,
-  getAllMongoTaggedPagesNotTaggedInConfluence,
+  getMongoTaggedPostsNotInConfluence,
 };
