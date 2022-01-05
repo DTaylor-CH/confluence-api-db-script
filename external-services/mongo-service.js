@@ -50,6 +50,7 @@ const persistGetCallResponses = async (postsArray) => {
               title: post.title,
               status: post.status,
               webui: post._links.webui,
+              tagged_in_confluence: false,
             },
           },
           { upsert: true }
@@ -67,9 +68,16 @@ const persistGetCallResponses = async (postsArray) => {
   console.log("Upsert operations completed without errors");
 };
 
+const getAllMongoTaggedPagesNotTaggedInConfluence = () => {
+  console.log(
+    "Reading from database. Documents which have tags, but which are not recorded as having had those tags transferred to Confluence will be held temporarily in memory"
+  );
+};
+
 module.exports = {
   setDbParameters,
   mongoConnect,
   mongoDisconnect,
   persistGetCallResponses,
+  getAllMongoTaggedPagesNotTaggedInConfluence,
 };
