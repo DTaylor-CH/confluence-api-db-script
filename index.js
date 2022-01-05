@@ -8,12 +8,12 @@ const {
   mongoConnect,
   mongoDisconnect,
   persistGetCallResponses,
-} = require("./mongo-service");
+} = require("./external-services/mongo-service");
 const {
   setAuthorisationHeader,
   setConfluenceSpace,
   getAllPagesInSpaceConfluenceApi,
-} = require("./confluence-api");
+} = require("./external-services/confluence-api");
 
 // Set-up to allow command line input to be assigned to variables, and program to exit when done
 const rl = readline.createInterface({
