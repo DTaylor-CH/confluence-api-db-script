@@ -47,7 +47,7 @@ const chooseAndExecuteChosenScript = async () => {
   `);
 
   if (scriptNumber) {
-    executeChosenScript(scriptNumber);
+    await executeChosenScript(scriptNumber);
   } else {
     console.log("You must choose a script number");
     chooseAndExecuteChosenScript();
