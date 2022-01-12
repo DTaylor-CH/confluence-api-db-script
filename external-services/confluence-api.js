@@ -34,14 +34,19 @@ const getAllPagesInSpaceConfluenceApi = async () => {
   if (_getAllPagesNextPage) {
     return fetch(_baseUrl + _getAllPagesNextPage, _requestOptions)
       .then((response) => {
-        return response.json();
+        if (response.status !== 200) {
+          throw `API GET call was unsuccessful. Confluence server response: ${response.status}`;
+        } else {
+          return response.json();
+        }
+        // return response.json();
       })
       .then((jsonResponseBody) => {
         _getAllPagesNextPage = jsonResponseBody?._links?.next || null;
         _allPages = [..._allPages, ...jsonResponseBody?.results] || [];
         return getAllPagesInSpaceConfluenceApi();
       })
-      .catch((error) => console.log("error", error));
+      .catch((error) => console.log("Error:", error));
   } else {
     console.log(
       `API calls complete. Total of ${_allPages.length} entries found`
@@ -69,7 +74,13 @@ const setSinglePageTagsInConfluence = async (page) => {
     `${_baseUrl}/rest/api/content/${page.post_id}/label`,
     _requestOptions
   )
-    .then((res) => res)
+    .then((res) => {
+      if (res.status !== 200) {
+        console.log("Error. Confluence server response: ", response.status);
+      } else {
+        return res;
+      }
+    })
     .catch((error) => error);
 };
 

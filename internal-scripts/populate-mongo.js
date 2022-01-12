@@ -46,7 +46,11 @@ const populateMongoSubScript = async (prompt) => {
     setConfluenceSpace(spaceName);
     await mongoConnect();
     const allPages = await getAllPagesInSpaceConfluenceApi();
-    await persistGetCallResponses(allPages);
+
+    // getAllPagesInSpaceConfluenceApi returns either json or an Error
+    if (!allPages instanceof Error) {
+      await persistGetCallResponses(allPages);
+    }
     await mongoDisconnect();
   } else {
     console.log(
