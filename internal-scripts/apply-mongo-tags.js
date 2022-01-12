@@ -3,12 +3,13 @@ const {
   setDbParameters,
   mongoConnect,
   mongoDisconnect,
-  getAllMongoTaggedPagesNotTaggedInConfluence,
+  getMongoTaggedPostsNotInConfluence,
 } = require("../external-services/mongo-service");
 
 const {
   setAuthorisationHeader,
   setConfluenceSpace,
+  setMongoTagsInConfluence,
 } = require("../external-services/confluence-api");
 
 // User inputs own parametes for Mongo script or accepts env vars as default (by pressing 'enter')
@@ -43,8 +44,13 @@ const applyMongoTagsSubScript = async (prompt) => {
     setDbParameters(mongoUri, dbName, collectionName);
     setAuthorisationHeader(accessToken);
     setConfluenceSpace(spaceName);
+
     await mongoConnect();
-    getAllMongoTaggedPagesNotTaggedInConfluence();
+
+    const cursor = await getMongoTaggedPostsNotInConfluence();
+    await setMongoTagsInConfluence(cursor);
+    await cursor.close();
+
     await mongoDisconnect();
   } else {
     console.log(
