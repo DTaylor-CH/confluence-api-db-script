@@ -69,7 +69,7 @@ const persistGetCallResponses = async (postsArray) => {
 };
 
 const getMongoTaggedPostsNotInConfluence = async () =>
-  // .find() returns a cursor rather than the actual document. Implicit return
+  // .find() returns a cursor rather than the actual document - which needs to be closed at the end. Implicit return
   await _client
     .db(_db)
     .collection(_collectionName)
@@ -78,10 +78,26 @@ const getMongoTaggedPostsNotInConfluence = async () =>
       gui_suggested_tags: { $exists: true },
     });
 
+const changeMongoFieldSinglePage = async (pageId, fieldName, fieldValue) => {
+  await _client
+    .db(_db)
+    .collection(_collectionName)
+    .updateOne(
+      { post_id: pageId },
+      {
+        $set: {
+          [fieldName]: fieldValue,
+        },
+      },
+      { upsert: true }
+    );
+};
+
 module.exports = {
   setDbParameters,
   mongoConnect,
   mongoDisconnect,
   persistGetCallResponses,
   getMongoTaggedPostsNotInConfluence,
+  changeMongoFieldSinglePage,
 };
